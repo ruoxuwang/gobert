@@ -21,7 +21,8 @@ func (id ID) Int32() int32 {
 // Dict is a container for tokens
 // NOTE: python uses an OrderedDict, unsure of implications
 type Dict struct {
-	tokens map[string]ID
+	Token2Index map[string]ID
+	Index2Token map[ID]string
 }
 
 // FromFile will read a newline delimited file into a Dict
@@ -34,7 +35,7 @@ func FromFile(path string) (Dict, error) {
 	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
-	voc := Dict{tokens: map[string]ID{}}
+	voc := Dict{Token2Index: map[string]ID{}, Index2Token: map[ID]string{}}
 	for scanner.Scan() {
 		voc.Add(scanner.Text())
 	}
@@ -43,35 +44,39 @@ func FromFile(path string) (Dict, error) {
 
 // New iwll return a a covab dict from the given tokens, IDs will match index
 func New(tokens []string) Dict {
-	v := make(map[string]ID, len(tokens))
+	token2Index := make(map[string]ID, len(tokens))
+	index2Token := make(map[ID]string, len(tokens))
 	for i, t := range tokens {
-		v[t] = ID(i)
+		token2Index[t] = ID(i)
+		index2Token[ID(i)] = t
 	}
-	return Dict{tokens: v}
+	return Dict{Token2Index: token2Index, Index2Token: index2Token}
 }
 
 // Add will add an item to the vocabulary, is not thread-safe
 func (v Dict) Add(token string) {
-	v.tokens[token] = ID(v.Size())
+	v.Token2Index[token] = ID(v.Size())
 }
 
 // GetID will return the ID of the token in the vocab. Will be negative if it doesn't exists
 func (v Dict) GetID(token string) ID {
-	id, ok := v.tokens[token]
+	id, ok := v.Token2Index[token]
 	if !ok {
 		return ID(-1)
 	}
 	return ID(id)
 }
 
-/*
-// GetToken will get a token by the ID, returns the mepty string if ID does not exist
-func (v Dict) GetToken(id ID) token {
-	for k, v := range v.tokens {
-		if v =
-
+// GetToken will get a token by the ID, returns the empty string if ID does not exist
+func (v Dict) GetToken(id ID) string {
+	token, ok := v.Index2Token[id]
+	if !ok {
+		return ""
 	}
+	return token
 }
+
+/*
 
 // HasID returns true if the vocab contains the token
 func (v Dict) HasID(id ID) bool {
@@ -88,7 +93,7 @@ func (v Dict) HasToken(token string) bool {
 
 // Size returns the size of the vocabulary
 func (v Dict) Size() int {
-	return len(v.tokens)
+	return len(v.Token2Index)
 }
 
 // LongestSubstring returns the longest token that is a substring of the token
@@ -96,7 +101,7 @@ func (v Dict) LongestSubstring(token string) string {
 	// Greedt, optimize to trie if needed
 	for i := len(token); i > 0; i-- {
 		sub := token[:i]
-		if _, ok := v.tokens[sub]; ok {
+		if _, ok := v.Token2Index[sub]; ok {
 			return sub
 		}
 	}

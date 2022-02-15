@@ -3,7 +3,7 @@ package vocab_test
 import (
 	"testing"
 
-	"github.com/buckhx/gobert/tokenize/vocab"
+	"github.com/ruoxuwang/gobert/tokenize/vocab"
 )
 
 func TestNewDict(t *testing.T) {

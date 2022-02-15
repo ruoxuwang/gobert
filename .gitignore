@@ -14,3 +14,6 @@
 bert-models/
 var/
 *.pyc
+examples/
+export/
+model/
