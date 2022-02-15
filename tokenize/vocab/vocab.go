@@ -55,7 +55,9 @@ func New(tokens []string) Dict {
 
 // Add will add an item to the vocabulary, is not thread-safe
 func (v Dict) Add(token string) {
-	v.Token2Index[token] = ID(v.Size())
+	idx := ID(v.Size())
+	v.Token2Index[token] = idx
+	v.Index2Token[idx] = token
 }
 
 // GetID will return the ID of the token in the vocab. Will be negative if it doesn't exists
