@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	fmt.Println("hello pkslow")
+	fmt.Println("Bert tokenization copy from https://github.com/buckhx/gobert")
 }
