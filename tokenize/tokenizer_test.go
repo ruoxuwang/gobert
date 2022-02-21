@@ -23,6 +23,7 @@ func TestBasic(t *testing.T) {
 	} {
 		tkz := tokenize.Basic{Lower: test.lower}
 		toks := tkz.Tokenize(test.text)
+		t.Logf("%s=>%v", test.text, toks)
 		if !reflect.DeepEqual(toks, test.tokens) {
 			t.Errorf("Test %s - Invalid Tokenization - Want: %v, Got: %v", test.name, test.tokens, toks)
 		}
@@ -44,6 +45,7 @@ func TestWordpiece(t *testing.T) {
 	} {
 		tkz := tokenize.NewWordpiece(voc)
 		toks := tkz.Tokenize(test.text)
+		t.Logf("%v", toks)
 		if !reflect.DeepEqual(toks, test.tokens) {
 			t.Errorf("Test %d - Invalid Tokenization - Want: %v, Got: %v", i, test.tokens, toks)
 		}

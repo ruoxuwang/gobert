@@ -28,23 +28,23 @@ func TestFeatureCount(t *testing.T) {
 }
 
 func Test_sequenceFeature(t *testing.T) {
-	voc := vocab.New([]string{"[CLS]", "[SEP]", "the", "dog", "is", "hairy", "."})
+	voc := vocab.New([]string{"[CLS]", "[SEP]", "the", "dog", "is", "hairy", "hurry", "##ing", "."})
 	tkz := NewTokenizer(voc)
 	for _, test := range []struct {
 		text    string
 		feature Feature
 	}{
 		// TODO more tests, but this one covers some good edge cases
-		{"the dog is hairy. ||| the ||| a dog is hairy", Feature{
+		{"the dog is hairy. ||| the hurrying ||| a dog is hairy", Feature{
 			ID:       0,
-			Text:     "the dog is hairy. ||| the ||| a dog is hairy",
-			Tokens:   []string{"[CLS]", "the", "dog", "[SEP]", "the", "[SEP]", "[UNK]", "[SEP]"},
-			TokenIDs: []int32{0, 2, 3, 1, 2, 1, -1, 1},
-			Mask:     []int32{1, 1, 1, 1, 1, 1, 1, 1},
-			TypeIDs:  []int32{0, 0, 0, 0, 1, 1, 2, 2},
+			Text:     "the dog is hairy. ||| the hurrying ||| a dog is hairy",
+			Tokens:   []string{"[CLS]", "the", "dog", "is", "hairy", "[SEP]", "the", "hurry", "##ing", "[SEP]", "[UNK]", "dog", "is", "[SEP]"},
+			TokenIDs: []int32{0, 2, 3, 4, 5, 1, 2, 6, 7, 1, -1, 3, 4, 1},
+			Mask:     []int32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			TypeIDs:  []int32{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2},
 		}},
 	} {
-		f := sequenceFeature(tkz, 8, test.text)
+		f := sequenceFeature(tkz, 14, test.text)
 		if !reflect.DeepEqual(f, test.feature) {
 			t.Errorf("Invalid Sequence Feature - Want: %+v, Got: %+v", test.feature, f)
 		}
@@ -62,7 +62,9 @@ func Test_sequenceTruncate(t *testing.T) {
 		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, -1, [][]string{{}, {}, {}}},
 		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, 0, [][]string{{}, {}, {}}},
 		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, 1, [][]string{{"a1"}, {}, {}}},
-		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, 3, [][]string{{"a1"}, {"b1"}, {"c1"}}},
+		{[][]string{{"a1"}, {"b1", "c2"}, {"c1", "c2"}}, 3, [][]string{{"a1"}, {"b1"}, {"c1"}}},
+		{[][]string{{"a1"}, {"b1", "c2"}, {"c1", "c2"}}, 4, [][]string{{"a1"}, {"b1", "c2"}, {"c1"}}},
+		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, 10, [][]string{{"a1"}, {"b1"}, {"c1", "c2"}}},
 		{[][]string{{"a1"}, {"b1"}, {"c1", "c2"}}, 10, [][]string{{"a1"}, {"b1"}, {"c1", "c2"}}},
 	} {
 		toks := truncate(test.seqs, test.len)

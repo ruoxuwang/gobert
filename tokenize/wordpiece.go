@@ -36,6 +36,9 @@ func NewWordpiece(voc vocab.Dict) Wordpiece {
 func (wp Wordpiece) Tokenize(text string) []string {
 	// TODO: determine if utf8 conversion is necessary, per python impl
 	// text = convert_to_unicode(text)
+	// For example:
+	//   input = "unaffable"
+	//   output = ["un", "##aff", "##able"]
 	var toks []string
 	for _, tok := range tokenizeWhitespace(text) {
 		if len(tok) > wp.maxWordChars {
