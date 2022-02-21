@@ -1,6 +1,7 @@
 package tokenize
 
 import (
+	// "fmt"
 	"fmt"
 	"strings"
 	"sync"
@@ -74,14 +75,14 @@ func sequenceFeature(tkz VocabTokenizer, seqLen int32, text string) Feature {
 		TypeIDs:  make([]int32, seqLen),
 	}
 	parts := strings.Split(text, SequenceSeparator)
-	fmt.Printf("sequenceFeature: parts=%v\n", parts)
+	// fmt.Printf("sequenceFeature: parts=%v\n", parts)
 	seqs := make([][]string, len(parts))
 	for i, part := range parts {
 		seqs[i] = tkz.Tokenize(part)
 	}
-	fmt.Printf("sequenceFeature: seqs=%v\n", seqs)
+	// fmt.Printf("sequenceFeature: seqs=%v\n", seqs)
 	seqs = truncate(seqs, seqLen-int32(len(seqs))-1) // truncate w/ space for CLS/SEP
-	fmt.Printf("sequenceFeature: seqs_truncate=%v\n", seqs)
+	// fmt.Printf("sequenceFeature: seqs_truncate=%v\n", seqs)
 	voc := tkz.Vocab()
 	var s int
 	f.Tokens[s] = ClassToken
